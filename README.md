@@ -8,7 +8,7 @@ This project was developed as part of the **Week 1: Fundamentals Application** a
 
 ## 🚀 Live Demo
 You can access the live application here: 
-🔗 [Insert your Streamlit Cloud Link Here]
+🔗 [[I(https://shiny-space-waffle-r5jj5wjx7p9fwq44-8501.app.github.dev/#available-races-schedule)]
 
 ---
 
@@ -53,22 +53,11 @@ To meet the project criteria, this application successfully integrates:
 
 ---
 
-## 💻 How to Run This Project Locally
-
-If you want to run this project on your local machine, follow these steps:
-
-1. **Clone the repository:**
-   ```bash
-   git clone [https://github.com/your-username/your-repo-name.git](https://github.com/your-username/your-repo-name.git)
-   cd your-repo-name
-
-
-
    Group Members
-Person 1: [Rahaf Makhdoom  / GitHub Username]
+Person 1: [Rahaf Makhdoom  / GitHub [https://github.com/Rahafmak]]
 
-Person 2: [Rana Aljuaid / GitHub Username]
+Person 2: [Rana Aljuaid / GitHub [https://github.com/ranatsa9/] ] 
 
-Person 3: [Maram Alzahrani / GitHub Username]
+Person 3: [Maram Alzahrani / GitHub[https://github.com/Maramjamaan]]
 
-Person 4: [Noura Ahmed  / GitHub Username]
+Person 4: [Noura Alshowair  / GitHub [https://github.com/Noura-1237]]
