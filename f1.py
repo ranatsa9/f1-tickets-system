@@ -267,8 +267,8 @@ if "selected_race" in st.session_state:
 
 if st.button("Confirm Reservation"):
 
-    if status != "Available":
-        st.error(f"Sorry, this race is {status}. You cannot book it.")
+    if selected_details["Status"] != "Available":
+        st.error(f"Sorry, this race is {selected_details['Status']}. You cannot book it.")
     else:
         st.success("Reservation Confirmed Successfully!")
 
@@ -283,7 +283,7 @@ Date: {races[selected_race]['Date']}
 
 Time: {races[selected_race]['Time']}
 
-Tickets: {"Quantity"}
+Tickets: {booking_user["Quantity"]}
 
 Subtotal: {order_subtotal:.2f} SAR
 
