@@ -8,7 +8,7 @@ This project was developed as part of the **Week 1: Fundamentals Application** a
 
 ## 🚀 Live Demo
 You can access the live application here: 
-🔗 [[I(https://shiny-space-waffle-r5jj5wjx7p9fwq44-8501.app.github.dev/#available-races-schedule)]
+🔗 [(https://f1-tickets-system-b4nm9ny54urpulrxrdghan.streamlit.app/)]
 
 ---
 
