@@ -211,6 +211,7 @@ st.markdown("""
     margin-bottom: 25px;
     border: 1px solid #2d3748;
     box-shadow: 0 8px 18px rgba(0,0,0,0.35);
+    text-align: center;
 }
 
 .f1-main-title {
@@ -285,99 +286,68 @@ st.markdown("""
     font-weight: bold;
 }
 
+.center-section {
+    max-width: 900px;
+    margin: auto;
+    text-align: center;
+}
+
 .payment-box {
     background: linear-gradient(135deg, #111827, #0f172a);
     padding: 24px;
     border-radius: 18px;
     border: 1px solid #334155;
-    margin-top: 15px;
+    margin: 20px auto;
+    max-width: 800px;
     box-shadow: 0 5px 15px rgba(0,0,0,0.35);
     color: white;
-}
-
-.receipt-box {
-    background: linear-gradient(135deg, #101827, #172033);
-    padding: 28px;
-    border-radius: 22px;
-    border: 1px solid #475569;
-    margin-top: 18px;
-    box-shadow: 0 8px 20px rgba(0,0,0,0.45);
-}
-
-.receipt-title {
-    color: white;
-    font-size: 28px;
-    font-weight: 900;
-    margin-bottom: 5px;
-}
-
-.receipt-subtitle {
-    color: #94a3b8;
-    font-size: 14px;
-    margin-bottom: 20px;
-}
-
-.receipt-row {
-    display: flex;
-    justify-content: space-between;
-    border-bottom: 1px solid #334155;
-    padding: 10px 0;
-    color: #e5e7eb;
-    font-size: 15px;
-}
-
-.receipt-label {
-    color: #94a3b8;
-    font-weight: 600;
-}
-
-.receipt-value {
-    color: white;
-    font-weight: 700;
-    text-align: right;
-}
-
-.receipt-total {
-    background-color: #dc2626;
-    color: white;
-    padding: 15px;
-    border-radius: 14px;
-    margin-top: 18px;
-    font-size: 20px;
-    font-weight: 900;
     text-align: center;
 }
 
-.confirmed-badge {
-    background-color: #16a34a;
-    color: white;
-    padding: 8px 14px;
-    border-radius: 999px;
-    font-weight: 800;
-    display: inline-block;
-    margin-top: 14px;
+.receipt-wrapper {
+    max-width: 1100px;
+    margin: 25px auto;
+}
+
+[data-testid="stMetricValue"] {
+    font-size: 24px;
+}
+
+[data-testid="stMetricLabel"] {
+    font-size: 14px;
 }
 </style>
 """, unsafe_allow_html=True)
 
 # =========================
-# Person 3: Functions
+# Person 3: Functions and Constants
 # =========================
+
+TICKET_TIERS = {
+    "General Admission (Standard)": 1.0,
+    "Grandstand Seating (Premium)": 1.5,
+    "VIP Champions Club (Luxury)": 2.5
+}
 
 def calculate_total(cart_item, database):
     subtotal = 0
     race_name = cart_item["Race"]
     quantity = cart_item["Quantity"]
 
+    ticket_type = cart_item.get("Ticket Type", "General Admission (Standard)")
+
     if race_name in database:
-        unit_price = database[race_name]["Price"]
-        subtotal = unit_price * quantity
+        base_unit_price = database[race_name]["Price"]
+        multiplier = TICKET_TIERS.get(ticket_type, 1.0)
+        subtotal = (base_unit_price * multiplier) * quantity
 
     return subtotal
 
 
 apply_discount = lambda amount: amount * 0.85
 apply_tax = lambda amount: amount * 1.15
+
+VALID_MEMBERSHIP_CODES = ["F1CLUB2026", "POLEPOSITION", "VIPPASS"]
 
 # =========================
 # Main Header
@@ -446,7 +416,7 @@ else:
                     <div class="f1-date">{details['Display Date']}</div>
                     <div class="f1-info">📍 {details['Location']}</div>
                     <div class="f1-info">⏰ {details['Time']}</div>
-                    <div class="f1-info">💰 {details['Price']} SAR</div>
+                    <div class="f1-info">💰 Starting from {details['Price']} SAR</div>
                     <div class="f1-info">Status: <span class="{status_class}">{status_text}</span></div>
                 </div>
                 """, unsafe_allow_html=True)
@@ -463,7 +433,8 @@ else:
                     st.info("Booking is closed.")
 
 # =========================
-# Person 2: Reservation Form
+# Person 2 + Person 3 + Person 4
+# Reservation, Payment, Receipt
 # =========================
 
 if "selected_race" in st.session_state:
@@ -472,196 +443,188 @@ if "selected_race" in st.session_state:
     selected_details = st.session_state["selected_details"]
 
     st.write("---")
-    st.write("## Complete Your Reservation")
 
-    col1, col2 = st.columns(2)
+    left_space, center_col, right_space = st.columns([0.5, 3, 0.5])
 
-    with col1:
+    with center_col:
+
+        st.markdown('<div class="center-section">', unsafe_allow_html=True)
+
+        st.write("## Complete Your Reservation")
+
         st.write(f"🏁 **Selected Race:** {selected_race}")
         st.write(f"📍 **Location:** {selected_details['Location']}")
         st.write(f"📅 **Date:** {selected_details['Date']}")
         st.write(f"⏰ **Time:** {selected_details['Time']}")
-
-    with col2:
-        st.write(f"💰 **Price per Ticket:** {selected_details['Price']} SAR")
+        st.write(f"💰 **Base Price per Ticket:** {selected_details['Price']} SAR")
         st.write(f"🎟️ **Status:** {selected_details['Status']}")
 
-    ticket_quantity = st.number_input(
-        "How many tickets would you like to reserve?",
-        min_value=1,
-        max_value=10,
-        value=1
-    )
+        quantity = st.number_input(
+            "How many tickets would you like to reserve?",
+            min_value=1,
+            max_value=10,
+            value=1
+        )
 
-    booking_user = {
-        "Race": selected_race,
-        "Location": selected_details["Location"],
-        "Date": selected_details["Date"],
-        "Time": selected_details["Time"],
-        "Price": selected_details["Price"],
-        "Quantity": ticket_quantity,
-        "Status": selected_details["Status"]
-    }
+        booking_user = {
+            "Race": selected_race,
+            "Location": selected_details["Location"],
+            "Date": selected_details["Date"],
+            "Time": selected_details["Time"],
+            "Price": selected_details["Price"],
+            "Quantity": quantity,
+            "Status": selected_details["Status"]
+        }
 
-    st.success("Your booking selection has been saved.")
+        st.success("Your booking selection has been saved.")
 
-    # =========================
-    # Person 3: Calculations & Discounts
-    # =========================
-def calculate_total(cart_item, database): 
+        # =========================
+        # Ticket Type Selection
+        # =========================
 
-    subtotal = 0 
+        st.write("---")
+        st.write("### 🎟️ Ticket Type & Experience")
 
-    race_name = cart_item["Race"]
+        selected_tier = st.selectbox(
+            "Choose your seating experience tier:",
+            options=list(TICKET_TIERS.keys())
+        )
 
-    quantity = cart_item["Quantity"]
+        booking_user["Ticket Type"] = selected_tier
 
-    
+        tier_multiplier = TICKET_TIERS[selected_tier]
+        tier_price = selected_details["Price"] * tier_multiplier
 
-    if race_name in database: 
+        st.write(f"**Selected Tier:** {selected_tier}")
+        st.write(f"**Tier Price per Ticket:** {tier_price:,.2f} SAR")
 
-        unit_price = database[race_name]['Price']
+        # =========================
+        # Membership Authentication
+        # =========================
 
-        subtotal = unit_price * quantity 
+        st.write("---")
+        st.write("### 🔐 Membership Authentication")
 
-    return subtotal
+        user_code = st.text_input(
+            "Enter your F1 Club Membership ID or Promo Code:",
+            placeholder="e.g., F1CLUB2026"
+        ).strip().upper()
 
+        order_subtotal = calculate_total(booking_user, races)
 
+        is_authenticated = False
 
-# Lambda functions for financial calculations
-
-apply_discount = lambda amount: amount * 0.85  # 15% discount
-
-apply_tax = lambda amount: amount * 1.15       # 15% VAT
-
-
-
-# Define the valid discount codes
-
-VALID_MEMBERSHIP_CODES = ["F1CLUB2026", "POLEPOSITION", "VIPPASS"]
-
-
-
-# Only execute if a race has been selected
-
-if "selected_race" in st.session_state:
-
-    
-
-    st.write("---")
-
-    st.write("### 🔐 Membership Authentication")
-
-    
-
-    # Text input for authenticating membership instead of a simple checkbox
-
-    user_code = st.text_input(
-
-        "Enter your 10-digit F1 Club Membership ID or Promo Code:", 
-
-        placeholder="e.g., F1CLUB2026"
-
-    ).strip()
-
-
-
-    # 1. Calculate the base subtotal
-
-    order_subtotal = calculate_total(booking_user, races)
-
-
-
-# 2. Authenticate code and apply discount conditionally
-
-    is_authenticated = False
-
-
-
-if user_code:  # If the user typed something
-
-        if user_code in VALID_MEMBERSHIP_CODES:
-
-            discounted_total = apply_discount(order_subtotal)
-
-            is_authenticated = True
-
-            st.success(" Membership authenticated! 15% VIP discount applied.")
-
+        if user_code:
+            if user_code in VALID_MEMBERSHIP_CODES:
+                discounted_total = apply_discount(order_subtotal)
+                is_authenticated = True
+                discount_status = "15% VIP Discount Applied"
+                st.success("Membership authenticated! 15% VIP discount applied.")
+            else:
+                discounted_total = order_subtotal
+                discount_status = "Invalid code - No discount applied"
+                st.error("Invalid code. Please check your code or continue without a discount.")
         else:
-
             discounted_total = order_subtotal
+            discount_status = "No Discount Applied"
 
-            st.error("Invalid Code. Please check your credentials or continue without a discount.")
+        final_total_with_tax = apply_tax(discounted_total)
 
-else:
+        # =========================
+        # Final Payment Details
+        # =========================
 
-        discounted_total = order_subtotal  # No code entered       
+        st.write("### 💳 Final Payment Details")
 
+        col_billing1, col_billing2 = st.columns(2)
 
+        with col_billing1:
+            st.write("**Selected Tier:**")
+            st.write("**Tier Price per Ticket:**")
+            st.write("**Base Subtotal:**")
+            if is_authenticated:
+                st.write("**Discounted Subtotal:**")
+            st.write("**Total Due including 15% VAT:**")
 
-# 3. Apply VAT to the final running total
+        with col_billing2:
+            st.write(selected_tier)
+            st.write(f"{tier_price:,.2f} SAR")
+            st.write(f"{order_subtotal:,.2f} SAR")
+            if is_authenticated:
+                st.write(f"{discounted_total:,.2f} SAR")
+            st.write(f"**{final_total_with_tax:,.2f} SAR**")
 
-final_total_with_tax = apply_tax(discounted_total)
+        # =========================
+        # Person 4: Checkout & Confirmation
+        # =========================
 
-# 4. Output the final payment breakdown to the UI
+        if st.button("Confirm Reservation"):
 
-st.write("### 💳 Final Payment Details")
+            status = selected_details["Status"]
 
-    
+            if status != "Available":
+                st.error(f"Sorry, this race is {status}. You cannot book it.")
 
-col_billing1, col_billing2 = st.columns(2)
+            else:
+                st.success("Reservation Confirmed Successfully!")
 
-with col_billing1:
+                st.write("### Receipt")
 
-        st.write(f"**Base Subtotal:**")
+                st.markdown('<div class="receipt-wrapper">', unsafe_allow_html=True)
 
-        if is_authenticated:
+                with st.container(border=True):
+                    st.markdown(f"#### {selected_race}")
+                    st.caption("Official F1 Grand Prix Ticket")
+                    st.write("")
 
-            st.write(f"**Discounted Subtotal:**")
+                    col1, col2 = st.columns(2)
 
-        st.write(f"**Total Due (including 15% VAT):**")
+                    with col1:
+                        st.markdown(f"**Location:** {races[selected_race]['Location']}")
+                        st.markdown(f"**Tickets:** {quantity} {'Ticket' if quantity == 1 else 'Tickets'}")
+                        st.markdown(f"**Ticket Tier:** {selected_tier}")
 
-        
+                    with col2:
+                        st.markdown(f"**Date:** {races[selected_race]['Date']}")
+                        st.markdown(f"**Time:** {races[selected_race]['Time']}")
+                        st.markdown(f"**Tier Price:** {tier_price:,.2f} SAR")
 
-with col_billing2:
+                    st.write("")
 
-        st.write(f"{order_subtotal:,.2f} SAR")
+                    m1, m2, m3 = st.columns(3)
 
-        if is_authenticated:
+                    m1.metric("Subtotal", f"{order_subtotal:,.1f} SAR")
+                    m2.metric("After Discount", f"{discounted_total:,.1f} SAR")
+                    m3.metric("Final Total (Incl. VAT)", f"{final_total_with_tax:,.1f} SAR")
 
-            st.write(f"*{discounted_total:,.2f} SAR*")
+                    st.write("")
+                    st.caption("Thank you for booking with us. See you at the track.")
 
-        st.write(f"**{final_total_with_tax:,.2f} SAR**") 
+                st.markdown('</div>', unsafe_allow_html=True)
 
+                receipt_text = f"""
+F1 RESERVATION RECEIPT
 
+Race: {selected_race}
+Location: {races[selected_race]['Location']}
+Date: {races[selected_race]['Date']} | Time: {races[selected_race]['Time']}
+Quantity: {quantity} Tickets
+Ticket Tier: {selected_tier}
+Tier Price per Ticket: {tier_price:,.1f} SAR
 
-    # =========================
-    # Person 4: Checkout & Confirmation
-    # =========================
+Subtotal: {order_subtotal:,.1f} SAR
+Discount: {discount_status}
+Discounted Total: {discounted_total:,.1f} SAR
+Final Total including VAT: {final_total_with_tax:,.1f} SAR
 
-    
-    if st.button("Confirm Reservation"):
+Status: Confirmed
+"""
 
-        if selected_details["Status"] != "Available":
-            st.error(f"Sorry, this race is {selected_details['Status']}. You cannot book it.")
+                st.download_button(
+                    label="Download Receipt as Text",
+                    data=receipt_text,
+                    file_name=f"F1_Receipt_{selected_race.replace(' ', '_')}.txt",
+                    mime="text/plain"
+                )
 
-        else:
-            st.success("Reservation Confirmed Successfully!")
-
-            st.write("## Receipt")
-
-            st.markdown(f"""
-            <div class="receipt-box">
-                <h3>F1 Ticket Reservation Receipt</h3>
-                <p><b>Race:</b> {selected_race}</p>
-                <p><b>Location:</b> {selected_details['Location']}</p>
-                <p><b>Date:</b> {selected_details['Date']}</p>
-                <p><b>Time:</b> {selected_details['Time']}</p>
-                <p><b>Tickets:</b> {booking_user["Quantity"]}</p>
-                <p><b>Subtotal:</b> {order_subtotal:.2f} SAR</p>
-                <p><b>After Discount:</b> {discounted_total:.2f} SAR</p>
-                <p><b>Final Total Including VAT:</b> {final_total_with_tax:.2f} SAR</p>
-                <p><b>Status:</b> Confirmed</p>
-            </div>
-            """, unsafe_allow_html=True)
+        st.markdown('</div>', unsafe_allow_html=True)
