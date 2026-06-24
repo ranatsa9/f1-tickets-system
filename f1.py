@@ -196,62 +196,66 @@ races = {
 # =========================
 # CSS Styling
 # =========================
+# =========================
+# Adaptive CSS Styling
+# =========================
 
 st.markdown("""
 <style>
-.stApp {
-    background-color: #070b14;
-    color: white;
-}
+/* Remove the hardcoded stApp background so Streamlit can control dark/light mode automatically */
 
 .f1-header {
-    background: linear-gradient(135deg, #111827, #1f2937);
+    /* Uses Streamlit's secondary background variable automatically */
+    background: var(--secondary-background-color);
     padding: 30px;
     border-radius: 22px;
     margin-bottom: 25px;
-    border: 1px solid #2d3748;
-    box-shadow: 0 8px 18px rgba(0,0,0,0.35);
+    border: 1px solid var(--border-color);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
     text-align: center;
 }
 
 .f1-main-title {
     font-size: 42px;
     font-weight: 900;
-    color: white;
+    color: var(--text-color); /* Automatically switches black/white */
     margin-bottom: 5px;
 }
 
 .f1-subtitle {
-    color: #d1d5db;
+    color: var(--text-color);
+    opacity: 0.8;
     font-size: 18px;
 }
 
 .f1-card {
-    background: linear-gradient(135deg, #111827, #1f2937);
+    background: var(--secondary-background-color);
     padding: 20px;
     border-radius: 18px;
     margin-bottom: 10px;
     min-height: 335px;
-    border: 1px solid #374151;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.35);
+    border: 1px solid var(--border-color);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.05);
 }
 
 .f1-round {
-    color: #9ca3af;
+    color: var(--text-color);
+    opacity: 0.6;
     font-size: 13px;
     font-weight: bold;
     letter-spacing: 1px;
 }
 
 .f1-country {
-    color: white;
+    color: var(--text-color);
     font-size: 28px;
     font-weight: 900;
     margin-top: 5px;
 }
 
 .f1-race-name {
-    color: #d1d5db;
+    color: var(--text-color);
+    opacity: 0.8;
     font-size: 13px;
     text-transform: uppercase;
     margin-top: 4px;
@@ -259,14 +263,14 @@ st.markdown("""
 }
 
 .f1-date {
-    color: #60a5fa;
+    color: #d93829; /* F1 Red accent */
     font-size: 25px;
     font-weight: bold;
     margin-top: 14px;
 }
 
 .f1-info {
-    color: #e5e7eb;
+    color: var(--text-color);
     font-size: 14px;
     margin-top: 7px;
 }
@@ -282,7 +286,7 @@ st.markdown("""
 }
 
 .completed {
-    color: #9ca3af;
+    color: #71717a;
     font-weight: bold;
 }
 
@@ -293,14 +297,14 @@ st.markdown("""
 }
 
 .payment-box {
-    background: linear-gradient(135deg, #111827, #0f172a);
+    background: var(--secondary-background-color);
     padding: 24px;
     border-radius: 18px;
-    border: 1px solid #334155;
+    border: 1px solid var(--border-color);
     margin: 20px auto;
     max-width: 800px;
-    box-shadow: 0 5px 15px rgba(0,0,0,0.35);
-    color: white;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+    color: var(--text-color);
     text-align: center;
 }
 
