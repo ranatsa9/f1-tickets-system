@@ -11,7 +11,7 @@ st.set_page_config(
 )
 
 # =========================
-# Person 1: Race Database
+# Rahaf: Race Database
 # =========================
 
 races = {
@@ -324,7 +324,7 @@ st.markdown("""
 """, unsafe_allow_html=True)
 
 # =========================
-# Person 3: Functions and Constants
+# Maram: Functions and Constants
 # =========================
 
 TICKET_TIERS = {
@@ -365,7 +365,7 @@ st.markdown("""
 """, unsafe_allow_html=True)
 
 # =========================
-# Person 1: Search Feature
+# Rahaf: Search Feature
 # =========================
 
 st.write("## Search for a Race")
@@ -374,7 +374,7 @@ search_feature = st.text_input("Enter race name, for example: British, Qatar, or
 st.write("## 2026 Formula 1 Race Schedule")
 
 # =========================
-# Person 1 + Person 2: Race Cards - Two per row
+# Rana: Race Cards - Two per row
 # =========================
 
 filtered_races = []
@@ -437,7 +437,7 @@ else:
                     st.info("Booking is closed.")
 
 # =========================
-# Person 2 + Person 3 + Person 4
+# Rana + Maram + Noura
 # Reservation, Payment, Receipt
 # =========================
 
@@ -559,7 +559,7 @@ if "selected_race" in st.session_state:
             st.write(f"**{final_total_with_tax:,.2f} SAR**")
 
         # =========================
-        # Person 4: Checkout & Confirmation
+        # Noura : Checkout & Confirmation
         # =========================
 
         if st.button("Confirm Reservation"):
